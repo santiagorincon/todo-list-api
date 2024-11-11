@@ -11,6 +11,11 @@ ConfigureServices(
     builder.Configuration
 );
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80);
+});
+
 var app = builder.Build();
 
 app.MapPost("/api/todos", async (TaskItem task, AppDbContext db) =>
@@ -84,7 +89,7 @@ app.MapDelete("/api/todos/{id}", async (int id, AppDbContext db) =>
     return Results.NoContent();
 });
 
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowAnyOrigin");
 
 app.Run();
 
@@ -97,9 +102,9 @@ void ConfigureServices(IServiceCollection services, ConfigurationManager configM
 
     services.AddCors(options =>
     {
-        options.AddPolicy("AllowLocalhost", policy =>
+        options.AddPolicy("AllowAnyOrigin", policy =>
         {
-            policy.WithOrigins("http://localhost:3000")
+            policy.AllowAnyOrigin()
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
